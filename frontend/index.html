@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản Lý Tài Liệu</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">📁 Quản Lý Tài Liệu</div>
+
+  <!-- ✅ thêm onkeyup -->
+  <input class="search-bar" id="searchInput" placeholder="Tìm tài liệu" onkeyup="search()" />
+
+  <div class="header-icons">⚙️ 👤</div>
+</div>
+
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <!-- ✅ thêm upload -->
+   <input type="file" id="fileInput" style="display:none" onchange="uploadFile()" />
+
+<button class="new-btn" onclick="document.getElementById('fileInput').click()">
+  + Mới
+</button>
+
+    <!-- khi chọn file thì upload -->
+    <input type="file" id="hiddenUpload" style="display:none" onchange="uploadFile()" />
+
+    <div class="menu active">🏠 Trang chủ</div>
+    <div class="menu">📂 Tài liệu của tôi</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <h2>Danh sách tài liệu</h2>
+
+    <div class="table-box">
+      <table>
+        <thead>
+          <tr>
+            <th>Tên</th>
+            <th>ID</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+
+        <!-- ✅ QUAN TRỌNG -->
+        <tbody id="tableBody"></tbody>
+
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
