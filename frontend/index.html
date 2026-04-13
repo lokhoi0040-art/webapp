@@ -15,7 +15,7 @@
   <div class="logo">📁 Quản Lý Tài Liệu</div>
 
   <!-- ✅ thêm onkeyup -->
-  <input class="search-bar" id="searchInput" placeholder="Tìm tài liệu" onkeyup="search()" />
+  <input class="search-bar" id="searchInput" placeholder="Tìm tài liệu" />
 
   <div class="header-icons">⚙️ 👤</div>
 </div>
@@ -27,12 +27,10 @@
     <!-- ✅ thêm upload -->
    <input type="file" id="fileInput" style="display:none" onchange="uploadFile()" />
 
-<button class="new-btn" onclick="document.getElementById('fileInput').click()">
+<button type="button" class="new-btn" onclick="document.getElementById('fileInput').click()">
   + Mới
 </button>
 
-    <!-- khi chọn file thì upload -->
-    <input type="file" id="hiddenUpload" style="display:none" onchange="uploadFile()" />
 
     <div class="menu active">🏠 Trang chủ</div>
     <div class="menu">📂 Tài liệu của tôi</div>

@@ -1,29 +1,23 @@
 const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
-const storage = multer.memoryStorage();
+// tạo folder uploads nếu chưa có
+const uploadPath = "uploads/";
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath);
+}
 
-const fileFilter = (req, file, cb) => {
-    const allowedTypes = [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "text/plain",
-        "image/jpeg",
-        "image/png"
-    ];
-
-    if (allowedTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(new Error("Invalid file type"), false);
-    }
-};
-const upload = multer({
-    storage,
-    limits: {
-        fileSize: 10 * 1024 * 1024
-    },
-    fileFilter
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + "-" + file.originalname;
+    cb(null, uniqueName);
+  }
 });
+
+const upload = multer({ storage });
 
 module.exports = upload;

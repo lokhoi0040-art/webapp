@@ -2,24 +2,18 @@ const express = require("express");
 const router = express.Router();
 
 const upload = require("../services/uploadService");
+const controller = require("../controllers/documentController");
 
-const {
-    uploadDocument,
-    getDocuments,
-    searchDocuments,
-    deleteDocument
-} = require("../controllers/documentController");
+// GET ALL
+router.get("/", controller.getDocuments);
 
-// Upload
-router.post("/upload", upload.single("file"), uploadDocument);
+// SEARCH (thêm luôn)
+router.get("/search", controller.searchDocuments);
 
-// Get all documents
-router.get("/", getDocuments);
+// UPLOAD (🔥 FIX CHÍNH Ở ĐÂY)
+router.post("/upload", upload.single("file"), controller.createDocument);
 
-// Search
-router.get("/search", searchDocuments);
-
-// Delete
-router.delete("/:id", deleteDocument);
+// DELETE
+router.delete("/:id", controller.deleteDocument);
 
 module.exports = router;

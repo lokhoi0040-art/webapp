@@ -1,57 +1,46 @@
 const BASE_URL = "http://127.0.0.1:3000/api/documents";
 
-// ================= LOAD =================
+// LOAD
 async function loadData() {
   try {
     const res = await fetch(BASE_URL);
-    const result = await res.json();
+    const data = await res.json();
 
-    render(result.data); // ✅ đúng
+    render(data); // ✅ FIX
   } catch (err) {
-    console.error("Không kết nối được backend", err);
+    console.error(err);
   }
 }
 
-// ================= RENDER =================
+// RENDER
 function render(data) {
   const table = document.getElementById("tableBody");
   table.innerHTML = "";
 
   if (!data || data.length === 0) {
-    table.innerHTML = `
-      <tr>
-        <td colspan="3">Không có dữ liệu</td>
-      </tr>
-    `;
+    table.innerHTML = `<tr><td colspan="3">Không có dữ liệu</td></tr>`;
     return;
   }
 
   data.forEach(file => {
-    const id = file.id;
-    const name = file.title; // ✅ đúng field backend
-
     table.innerHTML += `
       <tr>
-        <td>📄 ${name}</td>
-        <td>${id}</td>
+        <td>${file.title}</td>
+        <td>${file.id}</td>
         <td>
-          <button class="delete-btn" onclick="deleteFile('${id}')">
-            Xóa
-          </button>
+          <button onclick="deleteFile(${file.id})">Xóa</button>
         </td>
       </tr>
     `;
   });
 }
 
-// ================= UPLOAD =================
+// UPLOAD
 async function uploadFile() {
-  const file = document.getElementById("fileInput").files[0];
+  const input = document.getElementById("fileInput");
+  const file = input.files[0];
 
-  if (!file) {
-    alert("Chọn file!");
-    return;
-  }
+  if (!file) return alert("Chọn file!");
 
   const formData = new FormData();
   formData.append("file", file);
@@ -59,42 +48,37 @@ async function uploadFile() {
   formData.append("category", "general");
 
   try {
-    await fetch(`${BASE_URL}/upload`, {
+    const res = await fetch(`${BASE_URL}/upload`, {
       method: "POST",
       body: formData
     });
 
+    if (!res.ok) throw new Error("Upload lỗi");
+
+    await res.json();
+
+    input.value = "";
     loadData();
   } catch (err) {
+    console.error(err);
     alert("Upload lỗi!");
   }
 }
-// ================= DELETE =================
-async function deleteFile(id) {
-  try {
-    await fetch(`${BASE_URL}/${id}`, {
-      method: "DELETE"
-    });
 
-    loadData();
-  } catch (err) {
-    alert("Xóa lỗi!");
-  }
+// DELETE
+async function deleteFile(id) {
+  await fetch(`${BASE_URL}/${id}`, { method: "DELETE" });
+  loadData();
 }
 
-// ================= SEARCH =================
+// SEARCH
 async function search() {
   const keyword = document.getElementById("searchInput").value;
 
-  try {
-    const res = await fetch(`${BASE_URL}/search?keyword=${keyword}`);
-    const result = await res.json();
+  const res = await fetch(`${BASE_URL}/search?keyword=${keyword}`);
+  const data = await res.json();
 
-    render(result.data); // ✅ đúng
-  } catch (err) {
-    alert("Search lỗi!");
-  }
+  render(data);
 }
 
-// ================= INIT =================
 loadData();
