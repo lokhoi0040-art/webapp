@@ -4,22 +4,22 @@ const router = express.Router();
 const upload = require("../services/uploadService");
 
 const {
-  uploadDocument,
-  getDocuments,
-  searchDocuments,
-  deleteDocument
+    uploadDocument,
+    getDocuments,
+    searchDocuments,
+    deleteDocument
 } = require("../controllers/documentController");
 
-//  upload
+// Upload
 router.post("/upload", upload.single("file"), uploadDocument);
 
-//  get all
+// Get all documents
 router.get("/", getDocuments);
 
-// 🔥 search
+// Search
 router.get("/search", searchDocuments);
 
-//  delete
+// Delete
 router.delete("/:id", deleteDocument);
 
 module.exports = router;

@@ -1,0 +1,1 @@
+storageBucket: "qltl-project.appspot.com"

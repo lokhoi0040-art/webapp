@@ -4,7 +4,7 @@ const serviceAccount = require("../../serviceAccountKey.json");
 if (!admin.apps.length) {
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
-        storageBucket: "qltl-project.firebasestorage.app"
+        storageBucket: "qltl-project.appspot.com"
     });
 }
 
@@ -12,16 +12,29 @@ const db = admin.firestore();
 const bucket = admin.storage().bucket();
 
 // ===============================
-
-// 🔥 UPLOAD
+// UPLOAD
 const uploadDocument = async (req, res) => {
     try {
         const file = req.file;
-        const { title, category } = req.body;
+        const { title, category, tags } = req.body;
 
         if (!file) {
-            return res.status(400).json({ message: "No file uploaded" });
+            return res.status(400).json({
+                success: false,
+                message: "No file uploaded"
+            });
         }
+
+        if (!title || !category) {
+            return res.status(400).json({
+                success: false,
+                message: "Missing title or category"
+            });
+        }
+
+        const tagArray = tags
+            ? tags.split(",").map(t => t.trim().toLowerCase())
+            : [];
 
         const blob = bucket.file("documents/" + Date.now() + "_" + file.originalname);
 
@@ -37,54 +50,88 @@ const uploadDocument = async (req, res) => {
             await db.collection("documents").add({
                 title,
                 category,
+                tags: tagArray,
                 fileUrl,
+                filePath: blob.name,
                 createdAt: new Date()
             });
 
             res.json({
-                message: "Upload thành công 🔥",
+                success: true,
+                message: "Upload success",
                 fileUrl
             });
         });
 
         blobStream.on("error", (err) => {
-            res.status(500).json({ error: err.message });
+            res.status(500).json({
+                success: false,
+                message: err.message
+            });
         });
 
         blobStream.end(file.buffer);
 
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 };
 
 // ===============================
-
-// 🔥 GET ALL
+// GET ALL + PAGINATION
 const getDocuments = async (req, res) => {
     try {
-        const snapshot = await db.collection("documents").get();
+        const limit = parseInt(req.query.limit) || 10;
+        const lastId = req.query.lastId;
+
+        let query = db
+            .collection("documents")
+            .orderBy("createdAt", "desc")
+            .limit(limit);
+
+        if (lastId) {
+            const lastDoc = await db.collection("documents").doc(lastId).get();
+            if (lastDoc.exists) {
+                query = query.startAfter(lastDoc);
+            }
+        }
+
+        const snapshot = await query.get();
 
         const data = snapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         }));
 
-        res.json(data);
+        res.json({
+            success: true,
+            data
+        });
 
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 };
 
 // ===============================
-
-// 🔍 SEARCH + FILTER
+// SEARCH + FILTER + TAG
 const searchDocuments = async (req, res) => {
     try {
         const { keyword, category } = req.query;
 
-        const snapshot = await db.collection("documents").get();
+        let query = db.collection("documents");
+
+        if (category) {
+            query = query.where("category", "==", category);
+        }
+
+        const snapshot = await query.get();
 
         let data = snapshot.docs.map(doc => ({
             id: doc.id,
@@ -92,37 +139,91 @@ const searchDocuments = async (req, res) => {
         }));
 
         if (keyword) {
+            const key = keyword.toLowerCase();
+
             data = data.filter(item =>
-                item.title?.toLowerCase().includes(keyword.toLowerCase())
+                item.title?.toLowerCase().includes(key) ||
+                item.tags?.some(tag => tag.includes(key))
             );
         }
 
-        if (category) {
-            data = data.filter(item =>
-                item.category?.toLowerCase() === category.toLowerCase()
-            );
-        }
-
-        res.json(data);
+        res.json({
+            success: true,
+            data
+        });
 
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 };
 
-//  DELETE
+// ===============================
+// UPDATE
+const updateDocument = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, category, tags } = req.body;
+
+        const tagArray = tags
+            ? tags.split(",").map(t => t.trim().toLowerCase())
+            : [];
+
+        await db.collection("documents").doc(id).update({
+            title,
+            category,
+            tags: tagArray
+        });
+
+        res.json({
+            success: true,
+            message: "Updated successfully"
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+// ===============================
+// DELETE
 const deleteDocument = async (req, res) => {
     try {
         const { id } = req.params;
 
-        await db.collection("documents").doc(id).delete();
+        const docRef = db.collection("documents").doc(id);
+        const doc = await docRef.get();
+
+        if (!doc.exists) {
+            return res.status(404).json({
+                success: false,
+                message: "Document not found"
+            });
+        }
+
+        const data = doc.data();
+
+        if (data.filePath) {
+            await bucket.file(data.filePath).delete();
+        }
+
+        await docRef.delete();
 
         res.json({
-            message: "Xoá thành công 🔥"
+            success: true,
+            message: "Deleted successfully"
         });
 
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 };
 
@@ -130,5 +231,6 @@ module.exports = {
     uploadDocument,
     getDocuments,
     searchDocuments,
+    updateDocument,
     deleteDocument
 };
