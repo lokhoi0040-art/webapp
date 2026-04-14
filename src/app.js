@@ -8,8 +8,17 @@ const documentRoutes = require("./routes/documentRoutes");
 
 const app = express();
 
+// ✅ CORS chuẩn
+const corsOptions = {
+  origin: "*", // hoặc "http://127.0.0.1:5500"
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // 👈 FIX CORS preflight
+
 // middleware
-app.use(cors());
 app.use(express.json());
 
 // test route
@@ -30,12 +39,12 @@ app.use("/api/documents", documentRoutes);
   }
 })();
 
-// ❗ QUAN TRỌNG: bind 0.0.0.0 cho Railway
+// start server
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log("🚀 Server running on port " + PORT);
 });
 
-// debug ENV
+// debug
 console.log("MYSQL_URL:", process.env.MYSQL_URL);
