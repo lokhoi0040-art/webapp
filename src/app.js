@@ -10,14 +10,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ✅ chỉ 1 lần
 app.use("/api/documents", documentRoutes);
 
 app.get("/", (req, res) => {
   res.send("API đang chạy 🚀");
 });
 
-const PORT = process.env.PORT || 3000;
-app.use("/api/documents", documentRoutes);
+// ✅ BẮT BUỘC dùng PORT của Railway
+const PORT = process.env.PORT;
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running on port " + PORT);
 });
