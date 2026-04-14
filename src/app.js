@@ -2,26 +2,25 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+
 const db = require("./config/db");
 const documentRoutes = require("./routes/documentRoutes");
 
 const app = express();
 
-// CORS
-app.use(cors({ origin: "*" }));
-
 // middleware
+app.use(cors());
 app.use(express.json());
-
-// routes
-app.use("/api/documents", documentRoutes);
 
 // test route
 app.get("/", (req, res) => {
   res.send("API đang chạy 🚀");
 });
 
-// ✅ FIX DB CHECK (KHÔNG crash nữa)
+// routes
+app.use("/api/documents", documentRoutes);
+
+// test DB khi start
 (async () => {
   try {
     await db.query("SELECT 1");
@@ -31,10 +30,13 @@ app.get("/", (req, res) => {
   }
 })();
 
-// start server
+// ❗ QUAN TRỌNG: bind 0.0.0.0 cho Railway
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
+
+app.listen(PORT, "0.0.0.0", () => {
   console.log("🚀 Server running on port " + PORT);
 });
+
+// debug ENV
 console.log("HOST:", process.env.MYSQLHOST);
 console.log("PASS:", process.env.MYSQLPASSWORD);

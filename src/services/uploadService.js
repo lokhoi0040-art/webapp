@@ -7,9 +7,9 @@ try {
   const cloudinary = require("../config/cloudinary");
 
   if (
-    !process.env.CLOUDINARY_NAME ||
-    !process.env.CLOUDINARY_KEY ||
-    !process.env.CLOUDINARY_SECRET
+    !process.env.CLOUDINARY_CLOUD_NAME ||
+    !process.env.CLOUDINARY_API_KEY ||
+    !process.env.CLOUDINARY_API_SECRET
   ) {
     throw new Error("Missing Cloudinary ENV");
   }
@@ -27,7 +27,6 @@ try {
 } catch (err) {
   console.error("❌ Cloudinary fallback:", err.message);
 
-  // fallback không crash server
   const storage = multer.memoryStorage();
   upload = multer({ storage });
 }
