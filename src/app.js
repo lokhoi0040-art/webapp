@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: __dirname + "/.env" });
 
 const express = require("express");
 const cors = require("cors");
@@ -38,5 +38,4 @@ app.listen(PORT, "0.0.0.0", () => {
 });
 
 // debug ENV
-console.log("HOST:", process.env.MYSQLHOST);
-console.log("PASS:", process.env.MYSQLPASSWORD);
+console.log("MYSQL_URL:", process.env.MYSQL_URL);
