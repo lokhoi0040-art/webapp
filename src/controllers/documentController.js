@@ -3,7 +3,7 @@ const db = require("../config/db");
 // ================= GET ALL + SEARCH =================
 exports.getAll = async (req, res) => {
   try {
-    console.log("🔥 API /documents HIT");
+    console.log("🔥 API HIT /documents");
 
     const keyword = req.query.keyword;
 
@@ -21,7 +21,7 @@ exports.getAll = async (req, res) => {
 
     res.json(rows);
   } catch (err) {
-    console.error("❌ getAll:", err);
+    console.error("❌ getAll ERROR:", err);
     res.status(500).json(err);
   }
 };
