@@ -13,10 +13,9 @@ exports.getAll = async (req, res) => {
 exports.upload = async (req, res) => {
   try {
     const title = req.body.title;
-    const fileUrl = req.file.path;
+    const fileUrl = req.file?.path || "no-file";
 
     const sql = "INSERT INTO documents (title, file_url) VALUES (?, ?)";
-
     await db.query(sql, [title, fileUrl]);
 
     res.json({ message: "Upload thành công" });
@@ -29,7 +28,6 @@ exports.upload = async (req, res) => {
 exports.remove = async (req, res) => {
   try {
     const id = req.params.id;
-
     await db.query("DELETE FROM documents WHERE id=?", [id]);
 
     res.json({ message: "Deleted" });
