@@ -1,4 +1,4 @@
-const BASE_URL = "http://127.0.0.1:3000/api/documents";
+const BASE_URL = "http://192.168.x.x:3000/api/documents"; 
 
 // LOAD
 async function loadData() {
@@ -71,14 +71,22 @@ async function deleteFile(id) {
   loadData();
 }
 
-// SEARCH
-async function search() {
-  const keyword = document.getElementById("searchInput").value;
+let timeout;
 
-  const res = await fetch(`${BASE_URL}/search?keyword=${keyword}`);
-  const data = await res.json();
+function search() {
+  clearTimeout(timeout);
 
-  render(data);
+  timeout = setTimeout(async () => {
+    const keyword = document.getElementById("searchInput").value;
+
+    try {
+      const res = await fetch(`${BASE_URL}/search?keyword=${keyword}`);
+      const data = await res.json();
+      render(data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, 300);
 }
 
 loadData();

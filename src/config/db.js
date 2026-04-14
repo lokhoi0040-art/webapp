@@ -1,21 +1,16 @@
 const mysql = require("mysql2");
 
-console.log("🔥 DB FILE ĐANG CHẠY");
-
 const db = mysql.createConnection({
-  host: "127.0.0.1",
-  user: "root",
-  password: "",
-  database: "document_management", 
-  port: 3307
+  host: process.env.MYSQLHOST || "localhost",
+  user: process.env.MYSQLUSER || "appuser",
+  password: process.env.MYSQLPASSWORD || "123456",
+  database: process.env.MYSQLDATABASE || "document_management",
+  port: process.env.MYSQLPORT || 3307
 });
 
 db.connect(err => {
-  if (err) {
-    console.error("Lỗi kết nối DB:", err);
-  } else {
-    console.log("Kết nối MySQL thành công");
-  }
+  if (err) console.log(err);
+  else console.log("DB OK");
 });
 
 module.exports = db;
