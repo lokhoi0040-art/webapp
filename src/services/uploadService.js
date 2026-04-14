@@ -6,6 +6,14 @@ try {
   const { CloudinaryStorage } = require("multer-storage-cloudinary");
   const cloudinary = require("../config/cloudinary");
 
+  if (
+    !process.env.CLOUDINARY_NAME ||
+    !process.env.CLOUDINARY_KEY ||
+    !process.env.CLOUDINARY_SECRET
+  ) {
+    throw new Error("Missing Cloudinary ENV");
+  }
+
   const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
@@ -17,9 +25,9 @@ try {
   upload = multer({ storage });
 
 } catch (err) {
-  console.error("❌ Cloudinary init failed:", err);
+  console.error("❌ Cloudinary fallback:", err.message);
 
-  // fallback (để app không crash)
+  // fallback không crash server
   const storage = multer.memoryStorage();
   upload = multer({ storage });
 }

@@ -7,19 +7,24 @@ const documentRoutes = require("./routes/documentRoutes");
 
 const app = express();
 
-app.use(cors());
+// ✅ FIX CORS
+app.use(cors({
+  origin: "*"
+}));
+
 app.use(express.json());
 
-// ✅ chỉ 1 lần
+// ROUTES
 app.use("/api/documents", documentRoutes);
 
+// TEST
 app.get("/", (req, res) => {
   res.send("API đang chạy 🚀");
 });
 
-// ✅ BẮT BUỘC dùng PORT của Railway
-const PORT = process.env.PORT;
+// PORT (Railway bắt buộc phải có fallback)
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log("Server running on port " + PORT);
+  console.log("🚀 Server running on port " + PORT);
 });
