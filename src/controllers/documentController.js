@@ -2,14 +2,23 @@ const db = require("../config/db");
 
 exports.getAll = async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM documents");
+    const keyword = req.query.keyword;
+
+    let sql = "SELECT * FROM documents";
+    let params = [];
+
+    if (keyword) {
+      sql += " WHERE title LIKE ?";
+      params.push(`%${keyword}%`);
+    }
+
+    const [rows] = await db.query(sql, params);
     res.json(rows);
   } catch (err) {
     console.error("❌ getAll:", err);
     res.status(500).json(err);
   }
 };
-
 exports.upload = async (req, res) => {
   try {
     const title = req.body.title;
