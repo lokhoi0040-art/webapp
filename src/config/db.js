@@ -11,6 +11,6 @@ const db = mysql.createPool({
   queueLimit: 0
 });
 
-console.log("✅ MySQL pool created");
+console.log("✅ DB Pool created");
 
 module.exports = db;
