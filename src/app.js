@@ -7,10 +7,8 @@ const documentRoutes = require("./routes/documentRoutes");
 
 const app = express();
 
-// ✅ CORS (fix dứt điểm)
-app.use(cors({
-  origin: "*",
-}));
+// CORS
+app.use(cors({ origin: "*" }));
 
 // middleware
 app.use(express.json());
@@ -23,12 +21,11 @@ app.get("/", (req, res) => {
   res.send("API đang chạy 🚀");
 });
 
-// ✅ kiểm tra DB (không crash app)
+// ✅ FIX DB CHECK (KHÔNG crash nữa)
 (async () => {
   try {
-    const conn = await db.getConnection();
+    await db.query("SELECT 1");
     console.log("✅ DB connected");
-    conn.release();
   } catch (err) {
     console.error("❌ DB error:", err.message);
   }
